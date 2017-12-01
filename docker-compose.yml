@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  app:
+    image: portainer/portainer
+    logging:
+      driver: json-file
+    networks:
+      - front
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+  reverse_proxy:
+    image: nginx:latest
+    volumes:
+      - ./reverseproxy/config:/etc/nginx:rw
+      - ./reverseproxy/ssl:/etc/ssl
+    ports:
+      - "9000:443"
+    depends_on:
+      - app
+    networks:
+      - back
+      - front
+
+networks:
+  front:
+    driver: bridge
+  back:
+    driver: bridge
+    
+volumes:
+  portainer_data:
